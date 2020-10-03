@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryRepoImpl implements MealRepository{
-    private static AtomicLong id = new AtomicLong(0);
-    private static final ConcurrentHashMap<Long, Meal> data = new ConcurrentHashMap();
+    private static final AtomicLong id = new AtomicLong(0);
+    private static final ConcurrentHashMap<Long, Meal> data = new ConcurrentHashMap<>();
 
     static {
         data.put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
