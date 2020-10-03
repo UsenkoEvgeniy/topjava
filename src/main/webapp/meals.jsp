@@ -24,21 +24,27 @@
 <h3><a href="index.html">Home</a> </h3>
 <hr>
 <h2>Meals</h2>
-
+<a href = "addMeal.html">Add Meal</a>
+<p></p>
 <table>
     <thead>
     <tr>
+        <th>Id</th>
         <th>Date</th>
         <th>Description</th>
         <th>Calories</th>
+        <th colspan="2">Actions</th>
     </tr>
     </thead>
     <tbody>
         <c:forEach items = "${mealList}" var="meal">
             <tr style="color:${meal.excess? ' green':' red'}">
+                <td><c:out value="${meal.id}"/> </td>
                 <td><c:out value="${meal.dateTime.format(DateTimeFormatter.ofPattern('dd.MM.yyyy HH:mm'))}" /></td>
                 <td><c:out value="${meal.description}" /></td>
                 <td><c:out value="${meal.calories}" /></td>
+                <td>Update</td>
+                <td>Delete</td>
             </tr>
         </c:forEach>
     </tbody>
