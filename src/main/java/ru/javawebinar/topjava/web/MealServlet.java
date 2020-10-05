@@ -7,7 +7,6 @@ import ru.javawebinar.topjava.repository.InMemoryMealRepository;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -22,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private MealRepository mealRepo;
-    private int CALORIES_PER_DAY = 2000;
+    private int caloriesPerDay = 2000;
 
     @Override
     public void init() throws ServletException {
@@ -47,8 +47,9 @@ public class MealServlet extends HttpServlet {
             getServletContext().getRequestDispatcher("/addMeal.jsp").forward(req, resp);
         }
         if (!resp.isCommitted()) {
-            List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
+            List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
             req.setAttribute("mealList", mealList);
+            req.setAttribute("formatter", DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm"));
             getServletContext().getRequestDispatcher("/meals.jsp").forward(req, resp);
         }
     }

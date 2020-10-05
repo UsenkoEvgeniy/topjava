@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
 <!DOCTYPE html>
 <html lang ="ru">
 <style>
@@ -16,7 +15,6 @@
     }
 
 </style>
-<% request.setAttribute("formatter", DateTimeFormatter.ofPattern("dd.MM.yyyy H:mm"));%>
 <head>
     <title>Meals</title>
 </head>

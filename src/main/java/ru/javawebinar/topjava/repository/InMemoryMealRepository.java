@@ -5,12 +5,15 @@ import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryMealRepository implements MealRepository {
     private final AtomicLong id = new AtomicLong(0);
+    private final Map<Long, Meal> data = new ConcurrentHashMap<>();
 
-    public InMemoryMealRepository(){
+    public InMemoryMealRepository() {
         save(new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
         save(new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000));
         save(new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500));
@@ -31,11 +34,14 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal save(Meal meal) {
         Long tempId = meal.getId();
-        if (tempId == null || tempId > id.get() || tempId <= 0) {
-            tempId = id.incrementAndGet();
-            meal.setId(tempId);
+        if (tempId == null) {
+            data.computeIfAbsent(id.incrementAndGet(), k -> {
+                meal.setId(k);
+                return meal;
+            });
+        } else {
+            data.replace(tempId, meal);
         }
-        data.put(tempId, meal);
         return meal;
     }
 
