@@ -14,16 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static ru.javawebinar.topjava.util.TimeUtil.FORMATTER;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private MealRepository mealRepo;
     private int caloriesPerDay = 2000;
-    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Override
     public void init() throws ServletException {
@@ -50,7 +49,7 @@ public class MealServlet extends HttpServlet {
         if (!resp.isCommitted()) {
             List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
             req.setAttribute("mealList", mealList);
-            req.setAttribute("formatter", formatter);
+            req.setAttribute("formatter", FORMATTER);
             getServletContext().getRequestDispatcher("/meals.jsp").forward(req, resp);
         }
     }

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryMealRepository implements MealRepository {
-    private final AtomicLong counter = new AtomicLong(0);
+    private final AtomicLong id = new AtomicLong(0);
     private final Map<Long, Meal> data = new ConcurrentHashMap<>();
 
     public InMemoryMealRepository() {
@@ -36,7 +36,7 @@ public class InMemoryMealRepository implements MealRepository {
         Long tempId = meal.getId();
         Meal result;
         if (tempId == null) {
-            result = data.computeIfAbsent(counter.incrementAndGet(), k -> {
+            result = data.computeIfAbsent(id.incrementAndGet(), k -> {
                 meal.setId(k);
                 return meal;
             });
