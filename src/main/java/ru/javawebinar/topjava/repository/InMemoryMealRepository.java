@@ -35,10 +35,10 @@ public class InMemoryMealRepository implements MealRepository {
     public Meal save(Meal meal) {
         Long tempId = meal.getId();
         if (tempId == null) {
-            data.computeIfAbsent(id.incrementAndGet(), k -> {
+            while(data.computeIfAbsent(id.incrementAndGet(), k -> {
                 meal.setId(k);
                 return meal;
-            });
+            }) != meal) {}
         } else {
             data.replace(tempId, meal);
         }
