@@ -13,7 +13,7 @@ public class MealTo {
 
     private final boolean excess;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

@@ -3,7 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.repository.InMemoryRepoImpl;
+import ru.javawebinar.topjava.repository.InMemoryMealRepository;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -19,31 +19,37 @@ import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class MealServlet  extends HttpServlet {
+public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private final MealRepository mealRepo = new InMemoryRepoImpl();
+    private MealRepository mealRepo;
+    private int CALORIES_PER_DAY = 2000;
+
+    @Override
+    public void init() throws ServletException {
+        mealRepo = new InMemoryMealRepository();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        log.debug("redirect to meals");
 
         String action = req.getParameter("action");
-        log.debug(action);
+        String strId = req.getParameter("id");
+        log.debug("get received with action {} with id {}", action, strId);
 
-        if("delete".equals(action)) {
-            log.debug(req.getParameter("id"));
-            mealRepo.deleteById(Long.parseLong(req.getParameter("id")));
+        if ("delete".equals(action)) {
+            log.debug("Delete with id: {}", strId);
+            mealRepo.deleteById(Long.parseLong(strId));
             resp.sendRedirect("meals");
-        } else if("edit".equals(action)) {
-            req.setAttribute("meal", mealRepo.getById((Long.parseLong(req.getParameter("id")))));
-            RequestDispatcher reqDispAdd = getServletContext().getRequestDispatcher("/addMeal.jsp");
-            reqDispAdd.forward(req, resp);
+        } else if ("edit".equals(action) || "insert".equals(action)) {
+            if (strId != null && !strId.isEmpty()) {
+                req.setAttribute("meal", mealRepo.getById((Long.parseLong(strId))));
+            }
+            getServletContext().getRequestDispatcher("/addMeal.jsp").forward(req, resp);
         }
         if (!resp.isCommitted()) {
-            List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, 2000);
+            List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
             req.setAttribute("mealList", mealList);
-            RequestDispatcher rd = getServletContext().getRequestDispatcher("/meals.jsp");
-            rd.forward(req, resp);
+            getServletContext().getRequestDispatcher("/meals.jsp").forward(req, resp);
         }
     }
 
@@ -54,23 +60,16 @@ public class MealServlet  extends HttpServlet {
         String strDateTime = req.getParameter("dateTime");
         String description = req.getParameter("description");
         String strCalories = req.getParameter("calories");
-        log.debug(strId);
-        log.debug(strDateTime);
-        log.debug(description);
-        log.debug(strCalories);
+        log.debug("Save or update with id: {} date: {} description: {} calories: {}", strId, strDateTime, description, strCalories);
+
         Long id;
         try {
             id = Long.parseLong(strId);
         } catch (NumberFormatException e) {
             id = null;
         }
-        try{
-            LocalDateTime dateTime = LocalDateTime.parse(strDateTime);
-            int calories = Integer.parseInt(strCalories);
-            Meal meal = new Meal(id, dateTime, description, calories);
-            mealRepo.save(meal);
-        }catch (Exception ignored) {
-        }
+        Meal meal = new Meal(id, LocalDateTime.parse(strDateTime), description, Integer.parseInt(strCalories));
+        mealRepo.save(meal);
         resp.sendRedirect("meals");
     }
 }

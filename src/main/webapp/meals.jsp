@@ -1,11 +1,6 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: usenk
-  Date: 02.10.2020
-  Time: 17:03
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <!DOCTYPE html>
 <html lang ="ru">
 <style>
@@ -13,10 +8,15 @@
         border: 1px solid black;
         border-collapse: collapse;
     }
+    tr[red]{
+        color:red;
+    }
+    tr[green]{
+        color:green;
+    }
 
 </style>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
+<% request.setAttribute("formatter", DateTimeFormatter.ofPattern("dd.MM.yyyy H:mm"));%>
 <head>
     <title>Meals</title>
 </head>
@@ -24,7 +24,7 @@
 <h3><a href="index.html">Home</a> </h3>
 <hr>
 <h2>Meals</h2>
-<p><a href = "addMeal.jsp?action=insert">Add Meal</a></p>
+<p><a href = "meals?action=insert">Add Meal</a></p>
 <p></p>
 <table>
     <thead>
@@ -37,12 +37,12 @@
     </thead>
     <tbody>
         <c:forEach items = "${mealList}" var="meal">
-            <tr style="color:${meal.excess? ' red':' green'}">
-                <td><c:out value="${meal.dateTime.format(DateTimeFormatter.ofPattern('dd.MM.yyyy HH:mm'))}" /></td>
-                <td><c:out value="${meal.description}" /></td>
-                <td><c:out value="${meal.calories}" /></td>
-                <td><a href="meals?action=edit&id=<c:out value="${meal.id}"/>">Update</a></td>
-                <td><a href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a></td>
+            <tr ${meal.excess? 'red':'green'}>
+                <td>${meal.dateTime.format(formatter)}</td>
+                <td>${meal.description}</td>
+                <td>${meal.calories}</td>
+                <td><a href="meals?action=edit&id=${meal.id}">Update</a></td>
+                <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>
             </tr>
         </c:forEach>
     </tbody>
