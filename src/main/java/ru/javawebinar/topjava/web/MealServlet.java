@@ -23,6 +23,7 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private MealRepository mealRepo;
     private int caloriesPerDay = 2000;
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Override
     public void init() throws ServletException {
@@ -49,7 +50,7 @@ public class MealServlet extends HttpServlet {
         if (!resp.isCommitted()) {
             List<MealTo> mealList = MealsUtil.filteredByStreams(mealRepo.getAll(), LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
             req.setAttribute("mealList", mealList);
-            req.setAttribute("formatter", DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm"));
+            req.setAttribute("formatter", formatter);
             getServletContext().getRequestDispatcher("/meals.jsp").forward(req, resp);
         }
     }
