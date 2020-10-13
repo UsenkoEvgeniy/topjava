@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
+
 @Service
 public class MealService {
 
@@ -25,13 +27,11 @@ public class MealService {
     }
 
     public Meal get(int id, int userId) {
-        Meal result = repository.get(id, userId);
-        if (result == null) throw new NotFoundException("Not found");
-        return result;
+        return checkNotFoundWithId(repository.get(id, userId), id);
     }
 
     public void delete(int id, int userId) {
-        if (!repository.delete(id, userId)) throw new NotFoundException("Not found");
+        checkNotFoundWithId(repository.delete(id, userId), id);
     }
 
     public Meal create(Meal meal, int userId) {
@@ -41,10 +41,10 @@ public class MealService {
     }
 
     public void update(Meal meal, int userId) {
-        if (repository.save(meal, userId) == null) throw new NotFoundException("Null in update");
+        checkNotFoundWithId(repository.save(meal, userId), meal.getId());
     }
 
     public List<MealTo> getAllFiltered(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime, int userId, int userCalories) {
-        return repository.getAllFiltered(startDate, startTime, endDate, endTime, userId, userCalories);
+        return MealsUtil.getFilteredTos(repository.getAllFiltered(startDate, endDate, userId), userCalories, startTime, endTime);
     }
 }

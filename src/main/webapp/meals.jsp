@@ -22,20 +22,21 @@
     <hr/>
     <h2>Meals</h2>
 
-    <form method="post" action="meals?action=filter">
+    <form action="meals" method="get">
         <table>
-        <tr>
-            <td>От даты</td>
-            <td>До даты</td>
-            <td>От времени</td>
-            <td>До времени</td>
-        </tr>
-        <tr>
-            <td><input type="date" name="startDate"> </td>
-            <td><input type="date" name="endDate"></td>
-            <td><input type="time" name="startTime"></td>
-            <td><input type="time" name="endTime"></td>
-        </tr>
+            <input type="hidden" name="action" value="filter">
+            <tr>
+                <td>От даты</td>
+                <td>До даты</td>
+                <td>От времени</td>
+                <td>До времени</td>
+            </tr>
+            <tr>
+                <td><input type="date" name="startDate" value="${startDate}"></td>
+                <td><input type="date" name="endDate" value="${endDate}"></td>
+                <td><input type="time" name="startTime" value="${startTime}"></td>
+                <td><input type="time" name="endTime" value="${endTime}"></td>
+            </tr>
         </table>
         <button type="submit">Отфильтровать</button>
     </form>
