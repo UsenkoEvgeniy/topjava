@@ -5,7 +5,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,9 +34,7 @@ public class MealService {
     }
 
     public Meal create(Meal meal, int userId) {
-        Meal result = repository.save(meal, userId);
-        if (result == null) throw new NotFoundException("Not found");
-        return result;
+        return repository.save(meal, userId);
     }
 
     public void update(Meal meal, int userId) {
