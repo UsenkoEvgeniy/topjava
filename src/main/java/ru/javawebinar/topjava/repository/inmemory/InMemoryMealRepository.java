@@ -30,23 +30,25 @@ public class InMemoryMealRepository implements MealRepository {
         log.info("save {}", meal);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            repository.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
-            repository.get(userId).put(meal.getId(), meal);
+            Map<Integer, Meal> userMeals = repository.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
+            userMeals.put(meal.getId(), meal);
             return meal;
         }
-        if (get(meal.getId(), userId) == null) {
+        Map<Integer, Meal> userMeals = repository.get(userId);
+        if (userMeals == null) {
             return null;
         }
-        return repository.get(userId).computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        return userMeals.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
         log.info("delete id={}, userId={}", id, userId);
-        if (get(id, userId) == null) {
+        Map<Integer, Meal> userMeals = repository.get(userId);
+        if (userMeals == null) {
             return false;
         }
-        return repository.get(userId).remove(id) != null;
+        return userMeals.remove(id) != null;
     }
 
     @Override
@@ -59,25 +61,21 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public List<Meal> getAll(int userId) {
         log.info("getAll userId={}", userId);
-        Map<Integer, Meal> userMeals = repository.get(userId);
-        if (userMeals == null) {
-            return new ArrayList<>();
-        }
-        return filterByPredicate(userMeals.values(), meal -> true);
+        return filterByPredicate(userId, meal -> true);
     }
 
     @Override
     public List<Meal> getAllFiltered(LocalDate startDate, LocalDate endDate, int userId) {
         log.info("getAllFiltered userId{}", userId);
+        return filterByPredicate(userId, meal -> meal.getDate().compareTo(startDate) >= 0 && meal.getDate().compareTo(endDate) <= 0);
+    }
+
+    private List<Meal> filterByPredicate(int userId, Predicate<Meal> filter) {
         Map<Integer, Meal> userMeals = repository.get(userId);
         if (userMeals == null) {
             return new ArrayList<>();
         }
-        return filterByPredicate(userMeals.values(), meal -> meal.getDate().compareTo(startDate) >= 0 && meal.getDate().compareTo(endDate) <= 0);
-    }
-
-    private List<Meal> filterByPredicate(Collection<Meal> meals, Predicate<Meal> filter) {
-        return meals.stream()
+        return userMeals.values().stream()
                 .filter(filter)
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
