@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
-
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
@@ -24,15 +21,8 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        SecurityUtil.setAuthUserId(2);
-        for (int i = 0; i < 14; i++) {
-            Meal meal = MealsUtil.meals.get(i);
-            meal.setDescription("User " + authUserId() + " " + meal.getDescription());
-            save(meal, authUserId());
-            if (i == 6) {
-                SecurityUtil.setAuthUserId(1);
-            }
-        }
+        MealsUtil.meals.forEach(meal -> save(meal, 1));
+        MealsUtil.mealsUser2.forEach(meal -> save(meal, 2));
     }
 
     @Override
