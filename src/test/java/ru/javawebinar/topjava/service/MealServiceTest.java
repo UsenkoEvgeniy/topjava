@@ -33,12 +33,17 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal meal = mealService.get(MEAL1_ID, USER_ID);
-        assertMatch(meal, USER_MEAL1);
+        assertMatch(meal, UserMeal1);
     }
 
     @Test
     public void getNotFound() {
         assertThrows(NotFoundException.class, () -> mealService.get(111111, USER_ID));
+    }
+
+    @Test
+    public void getAnotherUserNotFound() {
+        assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
@@ -55,13 +60,13 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusive() {
         List<Meal> allFiltered = mealService.getBetweenInclusive(LocalDate.of(2020, 10, 18), LocalDate.of(2020, 10, 18), USER_ID);
-        assertMatch(allFiltered, USER_MEAL3, USER_MEAL2, USER_MEAL1);
+        assertMatch(allFiltered, UserMeal3, UserMeal2, UserMeal1);
     }
 
     @Test
     public void getAll() {
         List<Meal> all = mealService.getAll(ADMIN_ID);
-        assertMatch(all, ADMIN_MEAL3, ADMIN_MEAL2, ADMIN_MEAL1);
+        assertMatch(all, AdminMeal3, AdminMeal2, AdminMeal1);
     }
 
     @Test
@@ -75,13 +80,16 @@ public class MealServiceTest {
     }
 
     @Test
+    public void updateOtherUserMeal() {
+        Meal updated = mealService.get(MEAL1_ID, USER_ID);
+        updated.setDescription("отредактировано админом");
+        assertThrows(NotFoundException.class, () -> mealService.update(updated, ADMIN_ID));
+    }
+
+    @Test
     public void create() {
-        Meal newMeal = new Meal();
-        newMeal.setDescription("updated meal");
-        newMeal.setCalories(145);
-        newMeal.setDateTime(LocalDateTime.of(2020, 1, 18, 11, 45));
-        mealService.update(newMeal, USER_ID);
-        assertMatch(mealService.get(MEAL1_ID + 10, USER_ID), newMeal);
+        Meal meal = mealService.create(new Meal(UserMeal1.getDateTime(), "Завтрак админа", 2000), ADMIN_ID);
+        assertMatch(meal, mealService.get(MEAL1_ID + 10, ADMIN_ID));
     }
 
     @Test
@@ -89,6 +97,5 @@ public class MealServiceTest {
         Meal meal = new Meal(LocalDateTime.of(2020, 10, 18, 11, 0), "User обед повтор", 1001);
         assertThrows(DataAccessException.class, () ->
                 mealService.create(meal, USER_ID));
-
     }
 }
