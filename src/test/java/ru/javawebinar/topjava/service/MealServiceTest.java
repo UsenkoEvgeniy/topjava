@@ -12,13 +12,13 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
+import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -33,12 +33,12 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal meal = mealService.get(MEAL1_ID, USER_ID);
-        assertMatch(meal, UserMeal1);
+        assertMatch(meal, userMeal1);
     }
 
     @Test
     public void getNotFound() {
-        assertThrows(NotFoundException.class, () -> mealService.get(111111, USER_ID));
+        assertThrows(NotFoundException.class, () -> mealService.get(START_SEQ - 1, USER_ID));
     }
 
     @Test
@@ -60,41 +60,49 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusive() {
         List<Meal> allFiltered = mealService.getBetweenInclusive(LocalDate.of(2020, 10, 18), LocalDate.of(2020, 10, 18), USER_ID);
-        assertMatch(allFiltered, UserMeal3, UserMeal2, UserMeal1);
+        assertMatch(allFiltered, userMeal3, userMeal2, userMeal1);
+    }
+
+    @Test
+    public void getBetweenInclusiveWithNull() {
+        List<Meal> allFiltered = mealService.getBetweenInclusive(null, null, USER_ID);
+        assertMatch(allFiltered, userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1);
     }
 
     @Test
     public void getAll() {
         List<Meal> all = mealService.getAll(ADMIN_ID);
-        assertMatch(all, AdminMeal3, AdminMeal2, AdminMeal1);
+        assertMatch(all, adminMeal3, adminMeal2, adminMeal1);
     }
 
     @Test
     public void update() {
-        Meal updated = mealService.get(MEAL1_ID, USER_ID);
-        updated.setDescription("updated meal");
-        updated.setCalories(145);
-        updated.setDateTime(LocalDateTime.of(2020, 1, 18, 11, 45));
+        Meal updated = getUpdated();
         mealService.update(updated, USER_ID);
-        assertMatch(mealService.get(MEAL1_ID, USER_ID), updated);
+        assertMatch(mealService.get(MEAL1_ID, USER_ID), getUpdated());
     }
+
 
     @Test
     public void updateOtherUserMeal() {
-        Meal updated = mealService.get(MEAL1_ID, USER_ID);
+        Meal updated = getUpdated();
         updated.setDescription("отредактировано админом");
         assertThrows(NotFoundException.class, () -> mealService.update(updated, ADMIN_ID));
     }
 
     @Test
     public void create() {
-        Meal meal = mealService.create(new Meal(UserMeal1.getDateTime(), "Завтрак админа", 2000), ADMIN_ID);
-        assertMatch(meal, mealService.get(MEAL1_ID + 10, ADMIN_ID));
+        Meal newMeal = getNew();
+        Meal createdMeal = mealService.create(newMeal, ADMIN_ID);
+        Integer id = createdMeal.getId();
+        newMeal.setId(id);
+        assertMatch(createdMeal, newMeal);
+        assertMatch(mealService.get(id, ADMIN_ID), newMeal);
     }
 
     @Test
     public void duplicateDateTimeCreate() {
-        Meal meal = new Meal(LocalDateTime.of(2020, 10, 18, 11, 0), "User обед повтор", 1001);
+        Meal meal = new Meal(userMeal1.getDateTime(), "User обед повтор", 1001);
         assertThrows(DataAccessException.class, () ->
                 mealService.create(meal, USER_ID));
     }
