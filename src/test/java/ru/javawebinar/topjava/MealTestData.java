@@ -22,11 +22,6 @@ public class MealTestData {
     public static final Meal adminMeal2 = new Meal(MEAL1_ID + 8, LocalDateTime.of(2020, 10, 19, 11, 30), "Admin обед", 410);
     public static final Meal adminMeal3 = new Meal(MEAL1_ID + 9, LocalDateTime.of(2020, 10, 19, 18, 30), "Admin ужин", 410);
 
-    public static void assertMatch(Meal actual, Meal expected) {
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
-    }
-
-
     public static Meal getUpdated() {
         Meal updated = new Meal();
         updated.setId(MEAL1_ID);
@@ -38,6 +33,10 @@ public class MealTestData {
 
     public static Meal getNew() {
         return new Meal(userMeal1.getDateTime(), "Завтрак админа", 2000);
+    }
+
+    public static void assertMatch(Meal actual, Meal expected) {
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
     public static void assertMatch(Iterable<Meal> actual, Meal... expected) {
