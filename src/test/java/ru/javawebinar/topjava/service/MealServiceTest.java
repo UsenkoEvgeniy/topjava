@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.jboss.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
@@ -8,6 +7,8 @@ import org.junit.Test;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,49 +37,34 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private static final Logger logger = Logger.getLogger("");
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
     private static Map<String, Long> testTimes = new HashMap<>();
 
     private static void logInfo(Description description, String status, long nanos) {
         String testName = description.getMethodName();
-        logger.info(String.format("Test %s %s, spent %d microseconds",
-                testName, status, TimeUnit.NANOSECONDS.toMicros(nanos)));
+        logger.info(String.format("Test %s %s, spent %d ms",
+                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
     }
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
-        @Override
-        protected void succeeded(long nanos, Description description) {
-            logInfo(description, "succeeded", nanos);
-            testTimes.put(description.toString(), nanos);
-        }
-
-        @Override
-        protected void failed(long nanos, Throwable e, Description description) {
-            logInfo(description, "failed", nanos);
-            testTimes.put(description.toString(), nanos);
-        }
-
-        @Override
-        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
-            logInfo(description, "skipped", nanos);
-            testTimes.put(description.toString(), nanos);
-        }
 
         @Override
         protected void finished(long nanos, Description description) {
             logInfo(description, "finished", nanos);
-            testTimes.put(description.toString(), nanos);
+            testTimes.put(description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
         }
     };
 
     @AfterClass
     public static void logTimeForAllTests() {
+        StringBuilder logString = new StringBuilder("\n");
         long sum = testTimes.entrySet().stream()
-                .peek((k) -> logger.info(String.format("TestName: %s TestTime: %s", k.getKey(), k.getValue())))
+                .peek((k) -> logString.append(String.format("%s - %s ms\n", k.getKey(), k.getValue())))
                 .mapToLong(Map.Entry::getValue)
                 .sum();
-        logger.info(String.format("All tests time: %s", sum));
+        logString.append(String.format("All tests time: %s ms", sum));
+        logger.info(logString.toString());
     }
 
     @Autowired
