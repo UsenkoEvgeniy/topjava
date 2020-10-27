@@ -35,11 +35,10 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    @Autowired
-    private MealService service;
-
     private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
     private static Map<String, Long> testTimes = new HashMap<>();
+    @Autowired
+    private MealService service;
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
