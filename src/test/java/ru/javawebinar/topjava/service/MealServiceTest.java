@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
-import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Stopwatch;
@@ -36,22 +35,18 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    @Autowired
+    private MealService service;
 
     private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
     private static Map<String, Long> testTimes = new HashMap<>();
 
-    private static void logInfo(Description description, String status, long nanos) {
-        String testName = description.getMethodName();
-        logger.info(String.format("Test %s %s, spent %d ms",
-                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
-    }
-
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
-
         @Override
         protected void finished(long nanos, Description description) {
-            logInfo(description, "finished", nanos);
+            logger.info(String.format("Test %s finished, spent %d ms", description.getMethodName(),
+                    TimeUnit.NANOSECONDS.toMillis(nanos)));
             testTimes.put(description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
         }
     };
@@ -66,9 +61,6 @@ public class MealServiceTest {
         logString.append(String.format("All tests time: %s ms", sum));
         logger.info(logString.toString());
     }
-
-    @Autowired
-    private MealService service;
 
     @Test
     public void delete() throws Exception {
