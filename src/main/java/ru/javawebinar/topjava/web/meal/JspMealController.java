@@ -21,7 +21,7 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
 @RequestMapping("/meals")
-public class JspMealController extends AbstractMealRestController {
+public class JspMealController extends AbstractMealController {
 
     public JspMealController(MealService service) {
         super(service);
@@ -33,13 +33,13 @@ public class JspMealController extends AbstractMealRestController {
         return "meals";
     }
 
-    @GetMapping("/delete={id}")
+    @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") Integer id) {
         super.delete(id);
         return "redirect:/meals";
     }
 
-    @GetMapping("/update={id}")
+    @GetMapping("/update/{id}")
     public String update(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("meal", super.get(id));
         return "mealForm";
@@ -57,7 +57,7 @@ public class JspMealController extends AbstractMealRestController {
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        request.setAttribute("meals", super.getBetween(startDate, startTime, endDate, endTime));
+        model.addAttribute("meals", super.getBetween(startDate, startTime, endDate, endTime));
         return "/meals";
     }
 
@@ -67,7 +67,7 @@ public class JspMealController extends AbstractMealRestController {
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
 
-        if (request.getParameter("id").isEmpty()) {
+        if (request.getParameter("id") != null && request.getParameter("id").isEmpty()) {
             super.create(meal);
         } else {
             super.update(meal, getId(request));
@@ -79,5 +79,4 @@ public class JspMealController extends AbstractMealRestController {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
     }
-
 }
