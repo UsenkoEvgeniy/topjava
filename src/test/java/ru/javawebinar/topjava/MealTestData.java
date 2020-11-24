@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +12,7 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
     public static final TestMatcher<Meal> MEAL_MATCHER = TestMatcher.usingIgnoringFieldsComparator(Meal.class, "user");
+    public static final TestMatcher<MealTo> MEAL_TO_MATCHER = TestMatcher.usingIgnoringFieldsComparator(MealTo.class);
 
     public static final int NOT_FOUND = 10;
     public static final int MEAL1_ID = START_SEQ + 2;
@@ -25,6 +27,8 @@ public class MealTestData {
     public static final Meal meal7 = new Meal(MEAL1_ID + 6, of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 510);
     public static final Meal adminMeal1 = new Meal(ADMIN_MEAL_ID, of(2020, Month.JANUARY, 31, 14, 0), "Админ ланч", 510);
     public static final Meal adminMeal2 = new Meal(ADMIN_MEAL_ID + 1, of(2020, Month.JANUARY, 31, 21, 0), "Админ ужин", 1500);
+
+    public static final List<MealTo> MEAL_TO_LIST = List.of(new MealTo(meal1.getId(), meal1.getDateTime(), meal1.getDescription(), meal1.getCalories(), false));
 
     public static final List<Meal> meals = List.of(meal7, meal6, meal5, meal4, meal3, meal2, meal1);
 
