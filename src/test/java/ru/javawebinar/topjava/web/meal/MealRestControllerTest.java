@@ -39,6 +39,14 @@ public class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void getOne() throws Exception {
+        perform(get(REST_URL + MEAL1_ID))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_MATCHER.contentJson(meal1));
+    }
+    @Test
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID))
                 .andDo(print())
@@ -59,7 +67,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void createWithLocation() throws Exception {
         Meal newMeal = MealTestData.getNew();
-        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + USER_ID)
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(newMeal)))
                 .andExpect(status().isCreated());
@@ -72,7 +80,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(get(REST_URL + "/filter?startDateTime=2011-12-03T09:15:30&endDateTime=2020-01-30T11:15:30"))
+        perform(get(REST_URL + "/filter?startDate=2011-12-03&startTime=09:15:30&endDate=2020-01-30&endTime=11:15:30"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
