@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web.meal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -35,7 +36,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay())));
+                .andExpect(content().json(JsonUtil.writeValue(MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay()))));
     }
 
     @Test
@@ -46,6 +47,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_MATCHER.contentJson(meal1));
     }
+
     @Test
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID))
@@ -80,10 +82,24 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(get(REST_URL + "/filter?startDate=2011-12-03&startTime=09:15:30&endDate=2020-01-30&endTime=11:15:30"))
+        perform(get(REST_URL + "/filter")
+                .param("startDate", "2020-01-31")
+                .param("startTime", "12:15:30")
+                .param("endDate", "2020-01-31")
+                .param("endTime", "14:15:30"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MEAL_TO_LIST));
+                .andExpect(content().json(JsonUtil.writeValue(MEAL_TO_LIST)));
+    }
+
+    @Test
+    void getBetweenWithNulls() throws Exception {
+        perform(get(REST_URL + "/filter")
+                .param("startDate", ""))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(JsonUtil.writeValue(MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay()))));
     }
 }
