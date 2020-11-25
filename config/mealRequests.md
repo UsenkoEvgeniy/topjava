@@ -1,17 +1,24 @@
-#RestMeals
+# RestMeals
+____
 
-##getAll
+# getAll
+
 get all meals for user
-###Request
+
+## Request
+```
 curl --location --request GET 'http://localhost:8080/topjava/rest/meals'
-###Response
+```
+## Response
+```http request
 Status: 200 OK
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Tue, 24 Nov 2020 17:19:41 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
-
+```
+```json
 [
   {
     "id": 100008,
@@ -63,42 +70,63 @@ Connection: keep-alive
     "excess": true
   }
 ]
+```
+____
 
-##delete
+# delete
+
 delete user with id
-###Request
+
+## Request
+```
 curl --location --request DELETE 'http://localhost:8080/topjava/rest/meals/100002'
-###Response
+```
+## Response
+```
 Status: 204 No Content
 Date: Tue, 24 Nov 2020 17:24:54 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
+```
+____
 
-##put
+# put
+
 update meal
-###Request
+
+## Request
+```
 curl --location --request PUT 'http://localhost:8080/topjava/rest/meals/100003' \
 --data-raw '{
     "dateTime": "2020-01-30T13:00",
     "description": "Обновление через PUT",
     "calories": 1000
 }'
-###Response
+```
+## Response
+```
 Status: 204 No Content
 Date: Tue, 24 Nov 2020 17:24:48 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
+```
+____
 
-##create
+# create
+
 create meal
-###Request
+
+## Request
+```
 curl --location --request POST 'http://localhost:8080/topjava/rest/meals/' \
 --data-raw '    {
         "dateTime": "2020-01-30T13:54:00",
         "description": "Создание Post",
         "calories": 1000
     }'
-###Response
+``` 
+## Response
+```
 Status: 201 Created
 Location: http://localhost:8080/topjava/rest/meals/100011
 Content-Type: application/json;charset=UTF-8
@@ -106,7 +134,8 @@ Transfer-Encoding: chunked
 Date: Tue, 24 Nov 2020 17:24:29 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
-
+```
+```json
 {
     "id": 100011,
     "dateTime": "2020-01-30T13:54:00",
@@ -114,19 +143,27 @@ Connection: keep-alive
     "calories": 1000,
     "user": null
 }
+```
+____
 
-##getOne
+# getOne
+
 get one meal
-###Request
+
+## Request
+```
 curl --location --request GET 'http://localhost:8080/topjava/rest/meals/100008'
-###Response
+```
+## Response
+```
 Status: 200 OK
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Tue, 24 Nov 2020 17:24:39 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
-
+```
+```json
 {
     "id": 100008,
     "dateTime": "2020-01-31T20:00:00",
@@ -134,19 +171,27 @@ Connection: keep-alive
     "calories": 510,
     "user": null
 }
+```
+____
 
-##getFiltered
+# getFiltered
+
 Get filtered by date and time
-###Request
+
+## Request
+```
 curl --location --request GET 'http://localhost:8080/topjava/rest/meals/filter?startDate=2011-12-03&startTime=09:15:30&endDate=2020-01-30&endTime=11:15:30'
-###Response
+```
+## Response
+```
 Status: 200 OK
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Tue, 24 Nov 2020 17:03:28 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
-
+```
+```json
 [
     {
         "id": 100002,
@@ -156,3 +201,4 @@ Connection: keep-alive
         "excess": false
     }
 ]
+```
