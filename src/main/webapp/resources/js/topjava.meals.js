@@ -14,6 +14,18 @@ function clearFilter() {
     $.get("profile/meals/", updateTableByData);
 }
 
+$.ajaxSetup({
+    converters: {
+        "text json": function (stringData) {
+            var json = JSON.parse(stringData);
+            $(json).each(function () {
+                this.dateTime = this.dateTime.replace('T', ' ').substr(0, 16);
+            });
+            return json;
+        }
+    }
+});
+
 $(function () {
     ctx = {
         ajaxUrl: "profile/meals/",
@@ -26,13 +38,7 @@ $(function () {
             "info": true,
             "columns": [
                 {
-                    "data": "dateTime",
-                    "render": function (data, type, row) {
-                        if (type === "display") {
-                            return data.replace("T", " ");
-                        }
-                        return data;
-                    }
+                    "data": "dateTime"
                 },
                 {
                     "data": "description"
@@ -66,4 +72,62 @@ $(function () {
         }
     };
     makeEditable();
+
+    jQuery.datetimepicker.setLocale(navigator.language);
+    jQuery('#dateTime').datetimepicker({
+        format: 'Y-m-d H:i',
+        lang: 'ru',
+        i18n:{
+            ru:{
+                months:[
+                    'Январь','Февраль','Март','Апрель',
+                    'Май','Июнь','Июль','Август',
+                    'Сентябрь','Октябрь','Ноябрь','Декабрь',
+                ],
+                dayOfWeek:[
+                    "Вс", "Пн", "Вт", "Ср",
+                    "Чт", "Пт", "Сб",
+                ]
+            }
+        }
+    });
+});
+
+jQuery(function () {
+    jQuery('#startDate').datetimepicker({
+        format: 'Y-m-d',
+        onShow: function (ct) {
+            this.setOptions({
+                maxDate: jQuery('#endDate').val() ? jQuery('#endDate').val() : false
+            })
+        },
+        timepicker: false
+    });
+    jQuery('#endDate').datetimepicker({
+        format: 'Y-m-d',
+        onShow: function (ct) {
+            this.setOptions({
+                minDate: jQuery('#startDate').val() ? jQuery('#startDate').val() : false
+            })
+        },
+        timepicker: false
+    });
+    jQuery('#startTime').datetimepicker({
+        format: 'H:i',
+        onShow: function (ct) {
+            this.setOptions({
+                maxTime: jQuery('#endTime').val() ? jQuery('#endTime').val() : false
+            })
+        },
+        datepicker: false
+    });
+    jQuery('#endTime').datetimepicker({
+        format: 'H:i',
+        onShow: function (ct) {
+            this.setOptions({
+                minTime: jQuery('#startTime').val() ? jQuery('#startTime').val() : false
+            })
+        },
+        datepicker: false
+    });
 });
